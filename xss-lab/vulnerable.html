@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSS Lab - SECURE VERSION</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="warning-banner">
+            Halaman ini sudah diperbaiki dari XSS.
+        </div>
+
+        <h1>Kolom Komentar Blog</h1>
+        <p class="subtitle">Versi SECURE</p>
+
+        <!-- Comment Form -->
+        <section class="comment-form">
+            <h2>Tulis Komentar</h2>
+            <form id="commentForm">
+                <div class="form-group">
+                    <label for="username">Nama:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="comment">Komentar:</label>
+                    <textarea id="comment" rows="4" required></textarea>
+                </div>
+                <button type="submit">Kirim Komentar</button>
+            </form>
+        </section>
+
+        <!-- Comment Display -->
+        <section class="comments-section">
+            <h2>Komentar</h2>
+            <div id="commentsList"></div>
+        </section>
+    </div>
+
+    <script>
+        // Cookie contoh
+        document.cookie = "sessionId=abc123xyz; path=/";
+        document.cookie = "username=JohnDoe; path=/";
+
+        let comments = [];
+
+        document.getElementById('commentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const comment = document.getElementById('comment').value.trim();
+
+            if (!username || !comment) return;
+
+            comments.push({ username, comment });
+
+            displayComments();
+            this.reset();
+        });
+
+        function displayComments() {
+            const container = document.getElementById('commentsList');
+            container.innerHTML = '';
+
+            if (comments.length === 0) {
+                const p = document.createElement('p');
+                p.className = "no-comments";
+                p.textContent = "Belum ada komentar.";
+                container.appendChild(p);
+                return;
+            }
+
+            comments.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'comment-card';
+
+                const header = document.createElement('div');
+                header.className = 'comment-header';
+
+                const name = document.createElement('strong');
+                name.textContent = c.username;
+
+                const time = document.createElement('span');
+                time.className = 'comment-time';
+                time.textContent = "Baru saja";
+
+                header.appendChild(name);
+                header.appendChild(time);
+
+                const body = document.createElement('div');
+                body.className = 'comment-body';
+                body.textContent = c.comment; // Aman dari XSS
+
+                card.appendChild(header);
+                card.appendChild(body);
+
+                container.appendChild(card);
+            });
+        }
+
+        displayComments();
+    </script>
+</body>
+</html>
